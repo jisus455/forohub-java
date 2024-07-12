@@ -5,6 +5,8 @@ import com.jisus.forohub.models.datos.DatosTopico;
 import com.jisus.forohub.models.datos.DatosModificarTopico;
 import com.jisus.forohub.models.model.Topico;
 import com.jisus.forohub.repository.TopicoRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,16 +20,19 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/topicos")
+@SecurityRequirement(name = "bearer-key")
 public class TopicoController {
 
     @Autowired
     private TopicoRepository repository;
 
+    @Operation(summary = "obtener todos los topicos registrados")
     @GetMapping
     public ResponseEntity<Page<DatosTopico>> listadoTopicos(Pageable paginacion) {
         return ResponseEntity.ok(repository.findAll(paginacion).map(DatosTopico :: new));
     }
 
+    @Operation(summary = "obtener un topico especifico por id")
     @GetMapping("/{id}")
     public ResponseEntity<DatosTopico> obtenerTopico(@PathVariable Long id) {
         Optional<Topico> topico = repository.findAllById(id);
@@ -37,6 +42,7 @@ public class TopicoController {
         return ResponseEntity.notFound().build();
     }
 
+    @Operation(summary = "agregar un nuevo topico")
     @PostMapping
     @Transactional
     public ResponseEntity<DatosTopico> agregarTopico(@RequestBody @Valid DatosAgregarTopico datos, UriComponentsBuilder uriBuilder) {
@@ -52,6 +58,7 @@ public class TopicoController {
         }
     }
 
+    @Operation(summary = "modificar un topico existente por id")
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<DatosTopico> modificarTopico(@PathVariable Long id, @RequestBody @Valid DatosModificarTopico datos) {
@@ -66,6 +73,7 @@ public class TopicoController {
         return ResponseEntity.notFound().build();
     }
 
+    @Operation(summary = "borrar un topico existente por id")
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity borrarTopico(@PathVariable Long id) {
